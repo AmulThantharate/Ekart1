@@ -8,7 +8,7 @@ pipeline {
 
     tools {
         maven 'maven3'
-        jdk 'jdk-17'
+        jdk 'jdk21'
     }
 
     stages {
@@ -64,46 +64,46 @@ pipeline {
             }
         }
 
-        stage('deploy to Nexus') {
-            steps {
-                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk-17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
-                    sh "mvn deploy -DskipTests=true"
-                }
-            }
-        }
+        // stage('deploy to Nexus') {
+        //     steps {
+        //         withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk-17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+        //             sh "mvn deploy -DskipTests=true"
+        //         }
+        //     }
+        // }
         
 
-        stage('build and Tag docker image') {
-            steps {
-                script {
-                        sh "docker build -t youngminds73/ekart:latest -f docker/Dockerfile ."
-                    }
-            }
-        }
+        // stage('build and Tag docker image') {
+        //     steps {
+        //         script {
+        //                 sh "docker build -t youngminds73/ekart:latest -f docker/Dockerfile ."
+        //             }
+        //     }
+        // }
 
-        stage('Push image to Hub'){
-            steps{
-                script{
-                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                   sh 'docker login -u youngminds73 -p ${dockerhubpwd}'}
-                   sh 'docker push youngminds73/ekart:latest'
-                }
-            }
-        }
-        stage('EKS and Kubectl configuration'){
-            steps{
-                script{
-                    sh 'aws eks update-kubeconfig --region ap-south-1 --name project-cluster'
-                }
-            }
-        }
-        stage('Deploy to k8s'){
-            steps{
-                script{
-                    sh 'kubectl apply -f deploymentservice.yml'
-                }
-            }
-        }
+        // stage('Push image to Hub'){
+        //     steps{
+        //         script{
+        //            withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+        //            sh 'docker login -u youngminds73 -p ${dockerhubpwd}'}
+        //            sh 'docker push youngminds73/ekart:latest'
+        //         }
+        //     }
+        // }
+        // stage('EKS and Kubectl configuration'){
+        //     steps{
+        //         script{
+        //             sh 'aws eks update-kubeconfig --region ap-south-1 --name project-cluster'
+        //         }
+        //     }
+        // }
+        // stage('Deploy to k8s'){
+        //     steps{
+        //         script{
+        //             sh 'kubectl apply -f deploymentservice.yml'
+        //         }
+        //     }
+        // }
     }
 
 }
