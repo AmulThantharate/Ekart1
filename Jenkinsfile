@@ -47,14 +47,17 @@ pipeline {
                 }
             }
         }
+        
+        stage('Trivy File System Scan') {
+            steps {
+                sh 'trivy fs --format table -o trivy-fs-report.html .'
+            }
+        }
 
         stage('OWASP Dependency Check') {
             steps {
-                  withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
-                    dependencyCheck additionalArguments: "--nvdApiKey=$NVD_API_KEY",
-                                    odcInstallation: 'DC'
-             }
-        }
+                dependencyCheck odcInstallation: 'DC', nvdCredentialsId: 'NVD_API_KEY'
+            }
         }
 
         stage('Build') {
@@ -63,29 +66,35 @@ pipeline {
             }
         }
 
-        // stage('deploy to Nexus') {
-        //     steps {
-        //         withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk-17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
-        //             sh "mvn deploy -DskipTests=true"
-        //         }
-        //     }
-        // }
-        
+        stage('deploy to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk21', maven: 'mvn3', mavenSettingsConfig: '', traceability: true) {
+                    sh "mvn deploy -DskipTests=true"
+                }
+            }
+        }
 
-        // stage('build and Tag docker image') {
-        //     steps {
-        //         script {
-        //                 sh "docker build -t youngminds73/ekart:latest -f docker/Dockerfile ."
-        //             }
-        //     }
-        // }
+        stage('build and Tag docker image') {
+            steps {
+                script {
+                    sh "docker build -t claw4321/ekart:v2 ."
+                }
+            }
+        }
+
+        stage('Trivy Image Scan') {
+            steps {
+                sh "trivy image --format table -o trivy-image-report.html claw4321/ekart:v2"
+            }
+        }
 
         // stage('Push image to Hub'){
         //     steps{
         //         script{
-        //            withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-        //            sh 'docker login -u youngminds73 -p ${dockerhubpwd}'}
-        //            sh 'docker push youngminds73/ekart:latest'
+        //             withCredentials([string(credentialsId: 'DOCKER', variable: 'dockerhubpwd')]) {
+        //                 sh 'docker login -u claw4321 -p ${dockerhubpwd}'
+        //             }
+        //             sh 'docker push claw4321/ekart:v2'
         //         }
         //     }
         // }
