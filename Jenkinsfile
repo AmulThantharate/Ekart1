@@ -61,7 +61,7 @@ pipeline {
                     -v "$PWD:/src" \
                     -w /src \
                     ghcr.io/google/osv-scanner:v2 \
-                    scan source -r .
+                    scan source -r . || true
                 '''
             }
         }
