@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar'
-        NVD_API_KEY = credentials('NVD_API_KEY')  // Jenkins secret text credential
-    }
+        NVD_API_KEY = credentials('NVD_API_KEY')      }
 
     tools {
         maven 'mvn3'
