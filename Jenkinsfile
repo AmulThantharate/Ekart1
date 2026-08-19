@@ -97,20 +97,21 @@ pipeline {
                 }
             }
         }
-        stage('EKS and Kubectl configuration'){
+        stage('Deploy to EKS'){
             steps{
-                script{
-                    sh 'aws eks update-kubeconfig --region ap-south-1 --name ekart'
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        export AWS_DEFAULT_REGION=ap-south-1
+                        aws eks update-kubeconfig --region ap-south-1 --name ekart
+                        kubectl apply -f deploymentservice.yml
+                    '''
                 }
             }
         }
-        stage('Deploy to k8s'){
-            steps{
-                script{
-                    sh 'kubectl apply -f deploymentservice.yml'
-                }
-            }
-        }
+
     }
 
 }
