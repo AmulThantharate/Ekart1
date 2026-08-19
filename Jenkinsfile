@@ -92,7 +92,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'DOCKER_CRED', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                        sh 'docker push claw4321/ekart:v2'
+                        sh 'docker push claw4321/ekart:v3'
                     }
                 }
             }
