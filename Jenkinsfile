@@ -56,8 +56,13 @@ pipeline {
 
         stage('OSV Dependency Scan') {
             steps {
-                sh 'docker run --rm -v "$PWD":/src -w /src ghcr.io/google/osv-scanner:v1 --recursive .'
-
+                sh '''
+                    docker run --rm \
+                    -v "$PWD:/src" \
+                    -w /src \
+                    ghcr.io/google/osv-scanner:v2.6.0 \
+                    scan source -r .
+                '''
             }
         }
 
@@ -69,7 +74,7 @@ pipeline {
 
         stage('deploy to Nexus') {
             steps {
-                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk21', maven: 'mvn3', mavenSettingsConfig: '', traceability: true) {
+                withMaven(globalMavenSettingsConfig: 'e0399204-16ad-45f0-82d5-54edab2afb7a', jdk: 'jdk21', maven: 'mvn3', mavenSettingsConfig: '', traceability: true) {
                     sh "mvn deploy -DskipTests=true"
                 }
             }
@@ -89,16 +94,16 @@ pipeline {
             }
         }
 
-        // stage('Push image to Hub'){
-        //     steps{
-        //         script{
-        //             withCredentials([string(credentialsId: 'DOCKER', variable: 'dockerhubpwd')]) {
-        //                 sh 'docker login -u claw4321 -p ${dockerhubpwd}'
-        //             }
-        //             sh 'docker push claw4321/ekart:v2'
-        //         }
-        //     }
-        // }
+        stage('Push image to Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'DOCKER_CRED', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                        sh 'docker push claw4321/ekart:v2'
+                    }
+                }
+            }
+        }
         // stage('EKS and Kubectl configuration'){
         //     steps{
         //         script{
