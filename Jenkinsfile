@@ -54,9 +54,10 @@ pipeline {
             }
         }
 
-        stage('OWASP Dependency Check') {
+        stage('OSV Dependency Scan') {
             steps {
-                dependencyCheck odcInstallation: 'OWASP', nvdCredentialsId: 'NVD_API_KEY'
+                sh 'docker run --rm -v "$PWD":/src -w /src ghcr.io/google/osv-scanner:v1 --recursive .'
+
             }
         }
 
