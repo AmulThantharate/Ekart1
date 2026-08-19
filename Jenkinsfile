@@ -76,14 +76,14 @@ pipeline {
         stage('build and Tag docker image') {
             steps {
                 script {
-                    sh "docker build -t claw4321/ekart:v3 ."
+                    sh "docker build -t claw4321/ekart:v4 ."
                 }
             }
         }
 
         stage('Trivy Image Scan') {
             steps {
-                sh "trivy image --format table -o trivy-image-report.html claw4321/ekart:v3"
+                sh "trivy image --format table -o trivy-image-report.html claw4321/ekart:v4"
             }
         }
 
@@ -92,7 +92,7 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'DOCKER_CRED', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                        sh 'docker push claw4321/ekart:v3'
+                        sh 'docker push claw4321/ekart:v4'
                     }
                 }
             }
