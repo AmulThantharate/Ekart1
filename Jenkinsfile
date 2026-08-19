@@ -60,7 +60,7 @@ pipeline {
                     docker run --rm \
                     -v "$PWD:/src" \
                     -w /src \
-                    ghcr.io/google/osv-scanner:v2.6.0 \
+                    ghcr.io/google/osv-scanner:v2 \
                     scan source -r .
                 '''
             }
