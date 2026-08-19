@@ -83,14 +83,14 @@ pipeline {
         stage('build and Tag docker image') {
             steps {
                 script {
-                    sh "docker build -t claw4321/ekart:v2 ."
+                    sh "docker build -t claw4321/ekart:v3 ."
                 }
             }
         }
 
         stage('Trivy Image Scan') {
             steps {
-                sh "trivy image --format table -o trivy-image-report.html claw4321/ekart:v2"
+                sh "trivy image --format table -o trivy-image-report.html claw4321/ekart:v3"
             }
         }
 
@@ -104,20 +104,20 @@ pipeline {
                 }
             }
         }
-        // stage('EKS and Kubectl configuration'){
-        //     steps{
-        //         script{
-        //             sh 'aws eks update-kubeconfig --region ap-south-1 --name project-cluster'
-        //         }
-        //     }
-        // }
-        // stage('Deploy to k8s'){
-        //     steps{
-        //         script{
-        //             sh 'kubectl apply -f deploymentservice.yml'
-        //         }
-        //     }
-        // }
+        stage('EKS and Kubectl configuration'){
+            steps{
+                script{
+                    sh 'aws eks update-kubeconfig --region ap-south-1 --name ekart'
+                }
+            }
+        }
+        stage('Deploy to k8s'){
+            steps{
+                script{
+                    sh 'kubectl apply -f deploymentservice.yml'
+                }
+            }
+        }
     }
 
 }
